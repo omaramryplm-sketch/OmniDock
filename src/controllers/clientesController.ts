@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../prisma';
+import { ObtenerClientesQuery } from '../queries/ObtenerClientesQuery';
 
 export const getClientes = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const clientes = await prisma.clienteOperacion.findMany({
-      orderBy: { nombre_comercial: 'asc' }
-    });
+    const query = new ObtenerClientesQuery();
+    const clientes = await query.execute();
     res.json(clientes);
   } catch (error) {
     next(error);

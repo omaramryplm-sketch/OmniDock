@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../prisma';
+import { ObtenerViajesQuery } from '../queries/ObtenerViajesQuery';
+import { CrearViajeCommand, CrearViajeDTO } from '../commands/CrearViajeCommand';
 
 export const getViajes = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const viajes = await prisma.viajeConsolidado.findMany({
-      orderBy: { creado_en: 'desc' }
-    });
+    const query = new ObtenerViajesQuery();
+    const viajes = await query.execute();
     res.json(viajes);
   } catch (error) {
     next(error);
@@ -14,14 +14,9 @@ export const getViajes = async (req: Request, res: Response, next: NextFunction)
 
 export const createViaje = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { unidad_transporte, operador } = req.body;
-    const nuevoViaje = await prisma.viajeConsolidado.create({
-      data: {
-        unidad_transporte,
-        operador,
-        estado: 'Planeando'
-      }
-    });
+    const data: CrearViajeDTO = req.body;
+    const command = new CrearViajeCommand();
+    const nuevoViaje = await command.execute(data);
     res.status(201).json(nuevoViaje);
   } catch (error) {
     next(error);
