@@ -4,6 +4,7 @@ import { errorHandler } from './middlewares/errorMiddleware';
 import authRoutes from './routes/authRoutes';
 import recepcionesRoutes from './routes/recepcionesRoutes';
 import viajesRoutes from './routes/viajesRoutes';
+import clientesRoutes from './routes/clientesRoutes';
 import { prisma } from './prisma';
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/recepciones', recepcionesRoutes);
 app.use('/api/viajes', viajesRoutes);
+app.use('/api/clientes', clientesRoutes);
 
 app.use(errorHandler);
 

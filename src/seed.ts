@@ -18,6 +18,26 @@ async function main() {
   });
   
   console.log('Superadmin user seeded:', superadmin.email);
+
+  const cliente1 = await prisma.clienteOperacion.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      nombre_comercial: 'Logística del Norte',
+      rfc: 'LOGN123456789'
+    }
+  });
+
+  const cliente2 = await prisma.clienteOperacion.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+      nombre_comercial: 'Comercializadora ABC',
+      rfc: 'CABC123456789'
+    }
+  });
+
+  console.log('Clientes de prueba generados.');
 }
 
 main()
