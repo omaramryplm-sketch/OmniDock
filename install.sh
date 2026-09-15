@@ -40,9 +40,9 @@ docker-compose up -d --build
 echo "Esperando a que la base de datos esté lista..."
 sleep 10
 
-# Correr migraciones
-echo "Ejecutando migraciones de base de datos..."
-docker-compose exec -T app npx prisma migrate deploy
+# Crear tablas de base de datos
+echo "Creando tablas de base de datos..."
+docker-compose exec -T app npx prisma db push
 
 # Sembrar datos (Seeder para SuperAdmin)
 echo "Sembrando datos iniciales..."
