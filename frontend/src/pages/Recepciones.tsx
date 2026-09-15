@@ -1,26 +1,67 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
+import { X } from 'lucide-react';
 
 const Recepciones = () => {
   const [recepciones, setRecepciones] = useState<any[]>([]);
+  const [clientes, setClientes] = useState<any[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Form state
+  const [clienteId, setClienteId] = useState('');
+  const [documentoOrigen, setDocumentoOrigen] = useState('');
+  const [cantidadPlaneada, setCantidadPlaneada] = useState('');
+
+  const fetchRecepciones = async () => {
+    try {
+      const res = await api.get('/recepciones');
+      setRecepciones(res.data);
+    } catch (error) {
+      console.error('Error fetching recepciones:', error);
+    }
+  };
+
+  const fetchClientes = async () => {
+    try {
+      const res = await api.get('/clientes');
+      setClientes(res.data);
+    } catch (error) {
+      console.error('Error fetching clientes:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchRecepciones = async () => {
-      try {
-        const res = await api.get('/recepciones');
-        setRecepciones(res.data);
-      } catch (error) {
-        console.error('Error fetching recepciones:', error);
-      }
-    };
     fetchRecepciones();
+    fetchClientes();
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.post('/recepciones', {
+        cliente_id: parseInt(clienteId),
+        documento_origen: documentoOrigen,
+        cantidad_planeada: parseInt(cantidadPlaneada)
+      });
+      setIsModalOpen(false);
+      setClienteId('');
+      setDocumentoOrigen('');
+      setCantidadPlaneada('');
+      fetchRecepciones();
+    } catch (error) {
+      console.error('Error creando recepción:', error);
+      alert('Error al guardar la recepción');
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-medium text-gray-800">Control de Recepciones</h2>
-        <button className="bg-brand-700 text-white px-4 py-2 rounded shadow text-sm hover:bg-brand-800">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-brand-700 text-white px-4 py-2 rounded shadow text-sm hover:bg-brand-800"
+        >
           Nueva Recepción
         </button>
       </div>
@@ -55,6 +96,72 @@ const Recepciones = () => {
           )}
         </tbody>
       </table>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Registrar Recepción</h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-gray-700">
+                <X size={24} />
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Cliente</label>
+                <select 
+                  className="mt-1 block w-full rounded-md border-gray-300 border shadow-sm p-2 focus:border-brand-500 focus:ring-brand-500"
+                  value={clienteId}
+                  onChange={(e) => setClienteId(e.target.value)}
+                  required
+                >
+                  <option value="">Selecciona un cliente</option>
+                  {clientes.map(c => (
+                    <option key={c.id} value={c.id}>{c.nombre_comercial}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Documento de Origen</label>
+                <input 
+                  type="text" 
+                  className="mt-1 block w-full rounded-md border-gray-300 border shadow-sm p-2 focus:border-brand-500 focus:ring-brand-500"
+                  value={documentoOrigen}
+                  onChange={(e) => setDocumentoOrigen(e.target.value)}
+                  placeholder="Ej. Factura 1234"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Cantidad Planeada (Bultos/Cajas)</label>
+                <input 
+                  type="number" 
+                  className="mt-1 block w-full rounded-md border-gray-300 border shadow-sm p-2 focus:border-brand-500 focus:ring-brand-500"
+                  value={cantidadPlaneada}
+                  onChange={(e) => setCantidadPlaneada(e.target.value)}
+                  min="1"
+                  required
+                />
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit"
+                  className="px-4 py-2 bg-brand-700 text-white rounded-md hover:bg-brand-800 shadow-sm"
+                >
+                  Guardar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
