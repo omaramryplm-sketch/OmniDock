@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  frontend:
+    build: ./frontend
+    container_name: omnidock_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    networks:
+      - omnidock_net
+
   app:
     build: .
     container_name: omnidock_app
