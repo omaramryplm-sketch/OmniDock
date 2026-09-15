@@ -16,7 +16,23 @@ then
     exit 1
 fi
 
-# Levantar servicios en background
+cp .env.example .env
+
+echo ""
+read -p "Ingresa el nombre del cliente/empresa (ej. logistica-norte): " CLIENT_NAME
+read -p "Ingresa la dirección IP de este servidor (ej. 192.168.1.50): " SERVER_IP
+DOMAIN="${CLIENT_NAME}.${SERVER_IP}.nip.io"
+
+echo "DOMAIN=$DOMAIN" >> .env
+echo "FRONTEND_URL=http://$DOMAIN:8080" >> .env
+
+echo ""
+echo "=================================================="
+echo "🌐 OmniDock será configurado para el dominio:"
+echo "👉 http://$DOMAIN:8080"
+echo "=================================================="
+echo ""
+
 echo "Levantando servicios con docker-compose..."
 docker-compose up -d --build
 
