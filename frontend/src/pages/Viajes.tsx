@@ -1,4 +1,21 @@
+import { useState, useEffect } from 'react';
+import api from '../api';
+
 const Viajes = () => {
+  const [viajes, setViajes] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchViajes = async () => {
+      try {
+        const res = await api.get('/viajes');
+        setViajes(res.data);
+      } catch (error) {
+        console.error('Error fetching viajes:', error);
+      }
+    };
+    fetchViajes();
+  }, []);
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
       <div className="flex justify-between items-center mb-4">
@@ -18,16 +35,24 @@ const Viajes = () => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          <tr>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">V-2023-001</td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Transportes del Norte</td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Monterrey, NL</td>
-            <td className="px-6 py-4 whitespace-nowrap">
-              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                En Tránsito
-              </span>
-            </td>
-          </tr>
+          {viajes.length === 0 ? (
+            <tr><td colSpan={4} className="px-6 py-4 text-center text-gray-500">No hay viajes registrados</td></tr>
+          ) : (
+            viajes.map((viaje) => (
+              <tr key={viaje.id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">V-{viaje.id.toString().padStart(4, '0')}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{viaje.unidad_transporte}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{viaje.operador}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    viaje.estado === 'Planeando' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {viaje.estado}
+                  </span>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
