@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Recepciones from './pages/Recepciones';
+import Viajes from './pages/Viajes';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token');
@@ -24,6 +25,7 @@ function App() {
         }>
           <Route index element={<Dashboard />} />
           <Route path="recepciones" element={<Recepciones />} />
+          <Route path="viajes" element={<Viajes />} />
         </Route>
       </Routes>
     </BrowserRouter>
