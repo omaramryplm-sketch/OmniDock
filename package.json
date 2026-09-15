@@ -1,0 +1,13 @@
+{
+  "name": "omnidock",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/server.js", "build": "tsc", "seed": "tsx src/seed.ts", "dev": "tsx watch src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

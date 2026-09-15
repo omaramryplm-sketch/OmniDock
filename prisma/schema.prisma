@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ConfiguracionEmpresa {
+  id                       Int      @id @default(autoincrement())
+  razon_social             String
+  rfc                      String
+  direccion_fiscal         String
+  logo_url                 String?
+  creado_en                DateTime @default(now())
+  actualizado_en           DateTime @updatedAt
+  contador_actualizaciones Int      @default(0)
+
+  @@map("configuracion_empresa")
+}
+
+model Usuario {
+  id                       Int      @id @default(autoincrement())
+  nombre                   String
+  email                    String   @unique
+  password_hash            String
+  reset_token              String?
+  rol                      String   // [SuperAdmin, Admin, Operador]
+  creado_en                DateTime @default(now())
+  actualizado_en           DateTime @updatedAt
+  contador_actualizaciones Int      @default(0)
+
+  cargas_confirmadas       CargaConfirmada[]
+
+  @@map("usuarios")
+}
+
+model ClienteOperacion {
+  id                       Int      @id @default(autoincrement())
+  nombre_comercial         String
+  rfc                      String?
+  creado_en                DateTime @default(now())
+  actualizado_en           DateTime @updatedAt
+  contador_actualizaciones Int      @default(0)
+
+  recepciones              RecepcionPatio[]
+
+  @@map("clientes_operacion")
+}
+
+model RecepcionPatio {
+  id                       Int      @id @default(autoincrement())
+  cliente_id               Int
+  cliente                  ClienteOperacion @relation(fields: [cliente_id], references: [id])
+  documento_origen         String
+  cantidad_planeada        Int
+  cantidad_recibida        Int
+  estado                   String   // [En Patio, Consolidado]
+  creado_en                DateTime @default(now())
+  actualizado_en           DateTime @updatedAt
+  contador_actualizaciones Int      @default(0)
+
+  cargas_confirmadas       CargaConfirmada[]
+
+  @@map("recepciones_patio")
+}
+
+model ViajeConsolidado {
+  id                       Int      @id @default(autoincrement())
+  unidad_transporte        String
+  operador                 String
+  estado                   String   // [Planeando, Cargando, En Tránsito, Entregado]
+  creado_en                DateTime @default(now())
+  actualizado_en           DateTime @updatedAt
+  contador_actualizaciones Int      @default(0)
+
+  cargas_confirmadas       CargaConfirmada[]
+
+  @@map("viajes_consolidados")
+}
+
+model CargaConfirmada {
+  id                       Int      @id @default(autoincrement())
+  viaje_id                 Int
+  viaje                    ViajeConsolidado @relation(fields: [viaje_id], references: [id])
+  recepcion_id             Int
+  recepcion                RecepcionPatio @relation(fields: [recepcion_id], references: [id])
+  cantidad_cargada         Int
+  usuario_confirmo_id      Int
+  usuario_confirmo         Usuario @relation(fields: [usuario_confirmo_id], references: [id])
+  creado_en                DateTime @default(now())
+  actualizado_en           DateTime @updatedAt
+  contador_actualizaciones Int      @default(0)
+
+  @@map("carga_confirmada")
+}
